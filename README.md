@@ -43,4 +43,6 @@ If you don't use HACS, you can download js file from [latest releases](https://g
 
 ## Usage
 
+![screenshot](https://user-images.githubusercontent.com/19599059/197408620-5f2860ce-aa38-4667-a0f0-631be0d7f61e.jpg)
+
 https://user-images.githubusercontent.com/19599059/197408059-6a481e9a-c1d6-4910-be08-127d134f5f33.mov
