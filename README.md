@@ -2,7 +2,7 @@
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
 
-Dedicated UI for [Daily Schedule Integration](https://github.com/amitfin/daily_schedule) entities.
+Dedicated UI for [Daily Schedule Integration](https://github.com/amitfin/daily_schedule) entities with optimized view and simplyfied editing capabilities.
 
 _Note: this card is optional. Its purpose is simplification, but it doesn't add functionality._
 
