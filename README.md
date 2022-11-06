@@ -1,6 +1,12 @@
 # Daily Schedule Card
 
-[![hacs_badge](https://img.shields.io/badge/HACS-Default-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
+[![GitHub Release](https://img.shields.io/github/release/amitfin/lovelace-daily-schedule-card.svg?style=for-the-badge)](https://github.com/amitfin/lovelace-daily-schedule-card/releases)
+[![License](https://img.shields.io/github/license/amitfin/lovelace-daily-schedule-card.svg?style=for-the-badge)](LICENSE)
+
+[![hacs](https://img.shields.io/badge/HACS-Default-41BDF5.svg?style=for-the-badge)](https://github.com/custom-components/hacs)
+![Project Maintenance](https://img.shields.io/badge/maintainer-Amit%20Finkelstein%20%40amitfin-blue.svg?style=for-the-badge)
+
+
 
 Dedicated UI for [Daily Schedule Integration](https://github.com/amitfin/daily_schedule) entities with optimized view and simplyfied editing capabilities.
 
