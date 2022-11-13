@@ -9,7 +9,7 @@
 
 Dedicated UI for [Daily Schedule Integration](https://github.com/amitfin/daily_schedule) entities with an optimized view and simplyfied editing capabilities.
 
-_Note: this card is optional. Its purpose is simplification and improved user experience, but it doesn't add functionality. The integration itslef is a prerequisite and can be installed via HACS using this [link](https://my.home-assistant.io/redirect/hacs_repository/?owner=amitfin&repository=daily_schedule&category=integration)._
+_Note: The custom integration is a prerequisite and can be installed via HACS using this [link](https://my.home-assistant.io/redirect/hacs_repository/?owner=amitfin&repository=daily_schedule&category=integration). This card is optional. Its purpose is simplification and improved user experience, but it doesn't add functionality._
 
 ## Configuration
 
