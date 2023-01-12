@@ -106,6 +106,7 @@ class DailyScheduleCard extends HTMLElement {
 
   _updateContent() {
     for (const row of this._card._content._rows) {
+      row._content._icon.stateObj = this._hass.states[row._entity];
       this._setCardRowValue(row._content, this._getStateSchedule(row._entity));
     }
   }
@@ -120,6 +121,7 @@ class DailyScheduleCard extends HTMLElement {
     icon.stateObj = this._hass.states[entity];
     icon.overrideIcon = this._getStateIcon(entity);
     icon.stateColor = true;
+    content._icon = icon;
     content.appendChild(icon);
     const name_element = document.createElement("P");
     name_element.innerText = name;
