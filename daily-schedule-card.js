@@ -119,7 +119,6 @@ class DailyScheduleCard extends HTMLElement {
     content.style.gap = "16px";
     const icon = document.createElement("state-badge");
     icon.stateObj = this._hass.states[entity];
-    icon.overrideIcon = this._getStateIcon(entity);
     icon.stateColor = true;
     content._icon = icon;
     content.appendChild(icon);
@@ -146,12 +145,6 @@ class DailyScheduleCard extends HTMLElement {
   _getStateSchedule(entity) {
     const state = this._hass.states[entity];
     return !state ? [] : state.attributes.schedule || [];
-  }
-
-  _getStateIcon(entity) {
-    const state = this._hass.states[entity];
-    const icon =  state ? state.attributes.icon : null;
-    return icon || "mdi:timetable";
   }
 
   _setCardRowValue(content, state) {
