@@ -118,6 +118,7 @@ class DailyScheduleCard extends HTMLElement {
     content.style.alignItems = "center";
     content.style.gap = "16px";
     const icon = document.createElement("state-badge");
+    icon.style.flex = "none";
     icon.stateObj = this._hass.states[entity];
     icon.stateColor = true;
     content._icon = icon;
