@@ -128,6 +128,7 @@ class DailyScheduleCard extends HTMLElement {
     content.appendChild(name_element);
     const value_element = document.createElement("P");
     value_element.style.marginLeft = "auto";
+    value_element.style.textAlign = "right";
     content._value_element = value_element;
     this._setCardRowValue(content, this._getStateSchedule(entity));
     content.appendChild(value_element);
