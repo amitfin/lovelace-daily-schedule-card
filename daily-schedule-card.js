@@ -4,16 +4,19 @@ class DailyScheduleCard extends HTMLElement {
     if (!this._config) {
       return;
     }
-    if (!this._card) {
-      this._card = document.createElement("ha-card");
-      this._card.header = this._createHeader();
-      this._card.appendChild(this._card.header);
-      this._card._content = this._createContent();
-      this._card.appendChild(this._card._content);
-      this.appendChild(this._card);
+    if (!this._content) {
+      this._content = this._createContent();
+      if (this._config.title || this._config.card) {
+        const card = document.createElement("ha-card");
+        card.header = this._config.title;
+        this._content.classList.add("card-content");
+        card.appendChild(this._content);
+        this.appendChild(card);
+      } else {
+        this.appendChild(this._content);
+      }
     } else {
       this._updateContent();
-      this._updateHeader();
     }
   }
 
@@ -22,69 +25,26 @@ class DailyScheduleCard extends HTMLElement {
       this._config = config;
       return;
     }
-    if (!config.title && config.toggle) {
-      throw new Error("You need to define title when toggle is used");
-    }
     if (!config.entities) {
       throw new Error("You need to define entities");
     }
     this._config = config;
-    if (this._card) {
-      this.removeChild(this._card);
-      delete this._card;
-      this._card = null;
-    }
+    this.innerHTML = "";
+    this._content = null;
   }
 
   getCardSize() {
     return this._config !== null ? this._config.entities.length : 1;
   }
 
-  _createHeader() {
-    const header = document.createElement("DIV");
-    if (!this._config.title) {
-      return header;
-    }
-    header.style.display = "flex";
-    header.style.justifyContent = "space-between";
-    const title = document.createElement("DIV");
-    title.classList.add("name");
-    title.innerText = this._config.title;
-    header.appendChild(title);
-    if (this._config.toggle && this._hass.states[this._config.toggle]) {
-      const toggle = document.createElement("ha-switch");
-      toggle.style.padding = "13px 5px";
-      toggle.checked = this._hass.states[this._config.toggle].state === "on";
-      toggle.addEventListener("change", () => {
-        this._hass.callService("input_boolean", "toggle", {
-          entity_id: this._config.toggle,
-        });
-      });
-      header._toggle = toggle;
-      header.appendChild(toggle);
-    }
-    return header;
-  }
-
-  _updateHeader() {
-    if (this._card.header._toggle) {
-      const is_on = this._hass.states[this._config.toggle].state === "on";
-      if (this._card.header._toggle.checked !== is_on) {
-        this._card.header._toggle.checked = is_on;
-      }
-    }
-  }
-
   _createContent() {
     const content = document.createElement("DIV");
-    content.style.padding = "0px 16px";
     content._rows = [];
     for (const entry of this._config.entities) {
       const entity = entry.entity || entry;
       const row = document.createElement("DIV");
       row._entity = entity;
       row.classList.add("card-content");
-      row.style.padding = "0px 0px 8px";
       if (this._hass.states[entity]) {
         const content = this._createCardRow(
           entity,
@@ -105,7 +65,7 @@ class DailyScheduleCard extends HTMLElement {
   }
 
   _updateContent() {
-    for (const row of this._card._content._rows) {
+    for (const row of this._content._rows) {
       row._content._icon.stateObj = this._hass.states[row._entity];
       this._setCardRowValue(row._content, this._getStateSchedule(row._entity));
     }
