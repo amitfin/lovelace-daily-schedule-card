@@ -19,7 +19,7 @@ _Note: The custom integration is a prerequisite and can be installed via HACS us
 | ---- | ---- | -------- | ------- | -----------
 | type | string | True | - | Must be `custom:daily-schedule-card`
 | title | string | False | - | Title of the card
-
+| card | bool | False | _True if `title` is supplied_ | Whether to render an entire card or rows inside the `entities` card
 ### Entities
 
 | Name | Type | Required | Default | Description
@@ -29,14 +29,23 @@ _Note: The custom integration is a prerequisite and can be installed via HACS us
 
 _Note: you can also just give the entity ID (with no `entity:`) if you don't need to specify the name explicitely._
 
-### Example
+### Entities Card Example
 
 ```yaml
-type: 'custom:daily-schedule-card'
+type: entities
+entities:
+  - type: custom:daily-schedule-card
+    entities:
+      - entity: binary_sensor.venta_schedule
+        name: Venta
+```
+
+### Entire Card Example
+
+```yaml
+type: custom:daily-schedule-card
 title: Timers
 entities:
-  - entity: binary_sensor.venta_schedule
-    name: Venta
   - binary_sensor.swimming_pool_filter_schedule
 ```
 
