@@ -260,7 +260,7 @@ class DailyScheduleCard extends HTMLElement {
 
     for (const range of dialog._schedule) {
       if (range.from === null || range.to === null) {
-        if (dialog._message.innerText !== "Missing filed(s).") {
+        if (dialog._message.innerText !== "Missing field(s).") {
           dialog._message.innerText = "Missing field(s).";
         }
         return;
