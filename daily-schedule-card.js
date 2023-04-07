@@ -131,7 +131,6 @@ class DailyScheduleCard extends HTMLElement {
       "color"
     );
     plus.style.display = "flex";
-    plus.style.justifyContent = "center";
     const button = document.createElement("mwc-icon-button");
     plus._button = button;
     plus.appendChild(button);
@@ -153,7 +152,6 @@ class DailyScheduleCard extends HTMLElement {
     dialog._plus = plus;
     const message = document.createElement("P");
     message.style.display = "flex";
-    message.style.justifyContent = "center";
     message.style.color = "red";
     message.innerText = "";
     dialog._message = message;
@@ -196,10 +194,15 @@ class DailyScheduleCard extends HTMLElement {
     const row = document.createElement("DIV");
     row.style.color = getComputedStyle(document.body).getPropertyValue("color");
     row.style.display = "flex";
-    row.style.justifyContent = "space-around";
+    row.style.gap = "4px";
+    row.style.alignItems = "center";
+    if (index > 0) {
+      row.style.marginTop = "10px";
+    }
 
     const from_input = document.createElement("INPUT");
     from_input.setAttribute("type", "time");
+    from_input.style.cursor = "pointer";
     if (range.from !== null) {
       const time = range.from.split(":");
       from_input.value = time[0] + ":" + time[1];
@@ -217,12 +220,12 @@ class DailyScheduleCard extends HTMLElement {
     row.appendChild(from_input);
 
     const arrow = document.createElement("ha-icon");
-    arrow.style.marginTop = "10px";
     arrow.icon = "mdi:arrow-right-thick";
     row.appendChild(arrow);
 
     const to_input = document.createElement("INPUT");
     to_input.setAttribute("type", "time");
+    to_input.style.cursor = "pointer";
     if (range.to !== null) {
       const time = range.to.split(":");
       to_input.value = time[0] + ":" + time[1];
@@ -239,18 +242,16 @@ class DailyScheduleCard extends HTMLElement {
     }.bind(this);
     row.appendChild(to_input);
 
-    const button = document.createElement("mwc-icon-button");
-    button.style.marginTop = "-3px";
-    button.onclick = function () {
+    const remove = document.createElement("ha-icon");
+    remove.icon = "mdi:delete-outline";
+    remove.style.marginLeft = "auto";
+    remove.style.cursor = "pointer";
+    remove.onclick = function () {
       dialog._schedule = dialog._schedule.filter((_, i) => i !== index);
       this._createDialogRows(dialog);
       this._saveBackendEntity(dialog);
     }.bind(this);
-    row.appendChild(button);
-    const icon = document.createElement("ha-icon");
-    icon.style.marginTop = "-7px";
-    icon.icon = "mdi:delete";
-    button.appendChild(icon);
+    row.appendChild(remove);
 
     return row;
   }
