@@ -173,20 +173,35 @@ class DailyScheduleCard extends HTMLElement {
       "color"
     );
     header.style.display = "flex";
-    const button = document.createElement("mwc-icon-button");
-    button.style.marginLeft = "-18px";
-    button.onclick = function () {
+    header.style.gap = "12px";
+    header.style.alignItems = "start";
+    const close = document.createElement("ha-icon");
+    close.icon = "mdi:close";
+    close.style.marginLeft = "-4px";
+    close.style.cursor = "pointer";
+    close.onclick = function () {
       dialog.close();
     };
-    header.appendChild(button);
-    const icon = document.createElement("ha-icon");
-    icon.style.marginTop = "-8px";
-    icon.icon = "mdi:close";
-    button.appendChild(icon);
+    header.appendChild(close);
     const title_element = document.createElement("P");
-    title_element.style.margin = "10px 0px 0px 15px";
+    title_element.style.margin = "1px 0 0 0";
     title_element.innerText = title;
     header.appendChild(title_element);
+    const more_info = document.createElement("ha-icon");
+    more_info.icon = "mdi:information-outline";
+    more_info.style.marginLeft = "auto";
+    more_info.style.cursor = "pointer";
+    more_info.onclick = function () {
+      dialog.close();
+      const event = new Event("hass-more-info", {
+        bubbles: true,
+        cancelable: false,
+        composed: true,
+      });
+      event.detail = {entityId: dialog.entity};
+      this.dispatchEvent(event);
+    }.bind(this);
+    header.appendChild(more_info);
     return header;
   }
 
@@ -197,11 +212,12 @@ class DailyScheduleCard extends HTMLElement {
     row.style.gap = "4px";
     row.style.alignItems = "center";
     if (index > 0) {
-      row.style.marginTop = "10px";
+      row.style.marginTop = "12px";
     }
 
     const from_input = document.createElement("INPUT");
     from_input.setAttribute("type", "time");
+    from_input.style.padding = "4px 0";
     from_input.style.cursor = "pointer";
     if (range.from !== null) {
       const time = range.from.split(":");
@@ -225,6 +241,7 @@ class DailyScheduleCard extends HTMLElement {
 
     const to_input = document.createElement("INPUT");
     to_input.setAttribute("type", "time");
+    to_input.style.padding = "4px 0";
     to_input.style.cursor = "pointer";
     if (range.to !== null) {
       const time = range.to.split(":");
