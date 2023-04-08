@@ -4,6 +4,10 @@ class DailyScheduleCard extends HTMLElement {
     if (!this._config) {
       return;
     }
+    if (!this._dialog) {
+      this._createDialog();
+      this.appendChild(this._dialog);
+    }
     if (!this._content) {
       this._content = this._createContent();
       if (this._config.title || this._config.card) {
@@ -50,8 +54,7 @@ class DailyScheduleCard extends HTMLElement {
           entity,
           entry.name ||
           this._hass.states[entity].attributes.friendly_name ||
-          entity,
-          row
+          entity
         );
         row._content = content;
         row.appendChild(content);
@@ -71,7 +74,7 @@ class DailyScheduleCard extends HTMLElement {
     }
   }
 
-  _createCardRow(entity, name, parent) {
+  _createCardRow(entity, name) {
     const content = document.createElement("DIV");
     content.style.cursor = "pointer";
     content.style.display = "flex";
@@ -92,14 +95,14 @@ class DailyScheduleCard extends HTMLElement {
     content._value_element = value_element;
     this._setCardRowValue(content, this._getStateSchedule(entity));
     content.appendChild(value_element);
-    const dialog = this._createDialog(entity, name);
-    parent.appendChild(dialog);
     content.onclick = function () {
-      dialog._message.innerText = "";
-      dialog._plus._button.disabled = false;
-      dialog._schedule = [...this._getStateSchedule(entity)];
-      this._createDialogRows(dialog);
-      dialog.show();
+      this._dialog._entity = entity;
+      this._dialog._title.innerText = name;
+      this._dialog._message.innerText = "";
+      this._dialog._plus._button.disabled = false;
+      this._dialog._schedule = [...this._getStateSchedule(entity)];
+      this._createDialogRows();
+      this._dialog.show();
     }.bind(this);
     return content;
   }
@@ -121,11 +124,10 @@ class DailyScheduleCard extends HTMLElement {
     }
   }
 
-  _createDialog(entity, title) {
-    const dialog = document.createElement("ha-dialog");
-    dialog.entity = entity;
-    dialog.heading = this._createDialogHeader(title, dialog);
-    dialog.open = false;
+  _createDialog() {
+    this._dialog = document.createElement("ha-dialog");
+    this._dialog.heading = this._createDialogHeader();
+    this._dialog.open = false;
     const plus = document.createElement("DIV");
     plus.style.color = getComputedStyle(document.body).getPropertyValue(
       "color"
@@ -145,29 +147,28 @@ class DailyScheduleCard extends HTMLElement {
       if (button.disabled === true) {
         return;
       }
-      dialog._schedule.push({ from: null, to: null });
-      this._createDialogRows(dialog);
-      this._saveBackendEntity(dialog);
+      this._dialog._schedule.push({ from: null, to: null });
+      this._createDialogRows();
+      this._saveBackendEntity();
     }.bind(this);
-    dialog._plus = plus;
+    this._dialog._plus = plus;
     const message = document.createElement("P");
     message.style.display = "flex";
     message.style.color = "red";
     message.innerText = "";
-    dialog._message = message;
-    return dialog;
+    this._dialog._message = message;
   }
 
-  _createDialogRows(dialog) {
-    dialog.innerHTML = "";
-    dialog._schedule.forEach((range, index) => {
-      dialog.appendChild(this._createDialogRow(range, index, dialog));
+  _createDialogRows() {
+    this._dialog.innerHTML = "";
+    this._dialog._schedule.forEach((range, index) => {
+      this._dialog.appendChild(this._createDialogRow(range, index));
     });
-    dialog.appendChild(dialog._plus);
-    dialog.appendChild(dialog._message);
+    this._dialog.appendChild(this._dialog._plus);
+    this._dialog.appendChild(this._dialog._message);
   }
 
-  _createDialogHeader(title, dialog) {
+  _createDialogHeader() {
     const header = document.createElement("DIV");
     header.style.color = getComputedStyle(document.body).getPropertyValue(
       "color"
@@ -180,32 +181,32 @@ class DailyScheduleCard extends HTMLElement {
     close.style.marginLeft = "-4px";
     close.style.cursor = "pointer";
     close.onclick = function () {
-      dialog.close();
-    };
+      this._dialog.close();
+    }.bind(this);
     header.appendChild(close);
-    const title_element = document.createElement("P");
-    title_element.style.margin = "1px 0 0 0";
-    title_element.innerText = title;
-    header.appendChild(title_element);
+    const title = document.createElement("P");
+    title.style.margin = "1px 0 0 0";
+    header.appendChild(title);
+    this._dialog._title = title;
     const more_info = document.createElement("ha-icon");
     more_info.icon = "mdi:information-outline";
     more_info.style.marginLeft = "auto";
     more_info.style.cursor = "pointer";
     more_info.onclick = function () {
-      dialog.close();
+      this._dialog.close();
       const event = new Event("hass-more-info", {
         bubbles: true,
         cancelable: false,
         composed: true,
       });
-      event.detail = {entityId: dialog.entity};
+      event.detail = {entityId: this._dialog._entity};
       this.dispatchEvent(event);
     }.bind(this);
     header.appendChild(more_info);
     return header;
   }
 
-  _createDialogRow(range, index, dialog) {
+  _createDialogRow(range, index) {
     const row = document.createElement("DIV");
     row.style.color = getComputedStyle(document.body).getPropertyValue("color");
     row.style.display = "flex";
@@ -230,7 +231,7 @@ class DailyScheduleCard extends HTMLElement {
       const time = from_input.value + ":00";
       if (range.from !== time) {
         range.from = time;
-        this._saveBackendEntity(dialog);
+        this._saveBackendEntity();
       }
     }.bind(this);
     row.appendChild(from_input);
@@ -254,7 +255,7 @@ class DailyScheduleCard extends HTMLElement {
       const time = to_input.value + ":00";
       if (range.to !== time) {
         range.to = time;
-        this._saveBackendEntity(dialog);
+        this._saveBackendEntity();
       }
     }.bind(this);
     row.appendChild(to_input);
@@ -264,22 +265,22 @@ class DailyScheduleCard extends HTMLElement {
     remove.style.marginLeft = "auto";
     remove.style.cursor = "pointer";
     remove.onclick = function () {
-      dialog._schedule = dialog._schedule.filter((_, i) => i !== index);
-      this._createDialogRows(dialog);
-      this._saveBackendEntity(dialog);
+      this._dialog._schedule = this._dialog._schedule.filter((_, i) => i !== index);
+      this._createDialogRows();
+      this._saveBackendEntity();
     }.bind(this);
     row.appendChild(remove);
 
     return row;
   }
 
-  _saveBackendEntity(dialog) {
-    dialog._plus._button.disabled = true;
+  _saveBackendEntity() {
+    this._dialog._plus._button.disabled = true;
 
-    for (const range of dialog._schedule) {
+    for (const range of this._dialog._schedule) {
       if (range.from === null || range.to === null) {
-        if (dialog._message.innerText !== "Missing field(s).") {
-          dialog._message.innerText = "Missing field(s).";
+        if (this._dialog._message.innerText !== "Missing field(s).") {
+          this._dialog._message.innerText = "Missing field(s).";
         }
         return;
       }
@@ -287,18 +288,18 @@ class DailyScheduleCard extends HTMLElement {
 
     this._hass
       .callService("daily_schedule", "set", {
-        entity_id: dialog.entity,
-        schedule: dialog._schedule,
+        entity_id: this._dialog._entity,
+        schedule: this._dialog._schedule,
       })
       .then(() => {
-        if (dialog._message.innerText.length > 0) {
-          dialog._message.innerText = "";
+        if (this._dialog._message.innerText.length > 0) {
+          this._dialog._message.innerText = "";
         }
-        dialog._plus._button.disabled = false;
+        this._dialog._plus._button.disabled = false;
       })
       .catch((error) => {
-        if (dialog._message.innerText !== error.message) {
-          dialog._message.innerText = error.message;
+        if (this._dialog._message.innerText !== error.message) {
+          this._dialog._message.innerText = error.message;
         }
         return Promise.reject(error);
       });
