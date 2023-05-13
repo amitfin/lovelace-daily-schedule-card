@@ -128,6 +128,7 @@ class DailyScheduleCard extends HTMLElement {
     this._dialog = document.createElement("ha-dialog");
     this._dialog.heading = this._createDialogHeader();
     this._dialog.open = false;
+    this._dialog._save_counter = 0;
     const plus = document.createElement("DIV");
     plus.style.color = getComputedStyle(document.body).getPropertyValue(
       "color"
@@ -286,23 +287,32 @@ class DailyScheduleCard extends HTMLElement {
       }
     }
 
-    this._hass
-      .callService("daily_schedule", "set", {
-        entity_id: this._dialog._entity,
-        schedule: this._dialog._schedule,
-      })
-      .then(() => {
-        if (this._dialog._message.innerText.length > 0) {
-          this._dialog._message.innerText = "";
+    setTimeout(
+      function (counter) {
+        if (counter < this._dialog._save_counter) {
+          return;
         }
-        this._dialog._plus._button.disabled = false;
-      })
-      .catch((error) => {
-        if (this._dialog._message.innerText !== error.message) {
-          this._dialog._message.innerText = error.message;
-        }
-        return Promise.reject(error);
-      });
+        this._hass
+          .callService("daily_schedule", "set", {
+            entity_id: this._dialog._entity,
+            schedule: this._dialog._schedule,
+          })
+          .then(() => {
+            if (this._dialog._message.innerText.length > 0) {
+              this._dialog._message.innerText = "";
+            }
+            this._dialog._plus._button.disabled = false;
+          })
+          .catch((error) => {
+            if (this._dialog._message.innerText !== error.message) {
+              this._dialog._message.innerText = error.message;
+            }
+            return Promise.reject(error);
+          });
+      }.bind(this),
+      500,
+      ++(this._dialog._save_counter),
+    );
   }
 }
 
