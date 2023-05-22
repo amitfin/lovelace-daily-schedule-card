@@ -282,6 +282,7 @@ class DailyScheduleCard extends HTMLElement {
 
     const toggle = document.createElement("ha-switch");
     toggle.style.marginLeft = "auto";
+    toggle.style.paddingLeft = "16px";
     toggle.checked = !range.disabled;
     toggle.addEventListener("change", () => {
       range.disabled = !range.disabled;
