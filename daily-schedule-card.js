@@ -114,6 +114,7 @@ class DailyScheduleCard extends HTMLElement {
 
   _setCardRowValue(content, state) {
     let value = state
+      .filter((range) => !range.disabled)
       .map((range) => range.from.slice(0, -3) + "-" + range.to.slice(0, -3))
       .join(", ");
     if (!value.length) {
@@ -261,9 +262,17 @@ class DailyScheduleCard extends HTMLElement {
     }.bind(this);
     row.appendChild(to_input);
 
+    const toggle = document.createElement("ha-switch");
+    toggle.style.marginLeft = "auto";
+    toggle.checked = !range.disabled;
+    toggle.addEventListener("change", () => {
+      range.disabled = !range.disabled;
+      this._saveBackendEntity();
+    });
+    row.appendChild(toggle);
+
     const remove = document.createElement("ha-icon");
     remove.icon = "mdi:delete-outline";
-    remove.style.marginLeft = "auto";
     remove.style.cursor = "pointer";
     remove.onclick = function () {
       this._dialog._schedule = this._dialog._schedule.filter((_, i) => i !== index);
