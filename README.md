@@ -61,7 +61,7 @@ entities:
     template: >-
       {{ state_attr(entity_id, 'schedule') | rejectattr('disabled',
       'true') | map(attribute='from') | map('truncate', 2, True, '')
-      | join(', ') }}
+      | join(' | ') }}
 ```
 
 ## Install
