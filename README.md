@@ -59,8 +59,9 @@ card: true
 entities:
   - entity: binary_sensor.let_the_dog_out
     template: >-
-      {{ state_attr(entity_id, 'schedule') | map(attribute='from') |
-      map('truncate', 2, True, '') | join(' | ') }}
+      {{ state_attr(entity_id, 'schedule') | rejectattr('disabled',
+      'true') | map(attribute='from') | map('truncate', 2, True, '')
+      | join(', ') }}
 ```
 
 ## Install
