@@ -20,6 +20,7 @@ _Note: The custom integration is a prerequisite and can be installed via HACS us
 | type | string | True | - | Must be `custom:daily-schedule-card`
 | title | string | False | - | Title of the card
 | card | bool | False | _True if `title` is supplied_ | Whether to render an entire card or rows inside the `entities` card
+| template | string | False | `Null` | Template for rendering the value. Has access to `entity_id`
 
 ### Entities
 
@@ -27,7 +28,7 @@ _Note: The custom integration is a prerequisite and can be installed via HACS us
 | ---- | ---- | -------- | ------- | -----------
 | entity | string | True | - | The `binary_sensor` entity ID
 | name | string | False | _Friendly name of the entity_ | Name to display
-| template | string | False | `Null` | Template for rendering the value. Has access to `entity_id`.
+| template | string | False | `Null` | Per-entity template (overrides card's template)
 
 _Note: you can also just give the entity ID (with no `entity:`) if you don't need to specify the name explicitely._
 
@@ -56,12 +57,12 @@ entities:
 ```yaml
 type: custom:daily-schedule-card
 card: true
+template: >-
+  {{ state_attr(entity_id, 'schedule') | rejectattr('disabled',
+  'true') | map(attribute='from') | map('truncate', 2, True, '')
+  | join(' | ') }}
 entities:
-  - entity: binary_sensor.let_the_dog_out
-    template: >-
-      {{ state_attr(entity_id, 'schedule') | rejectattr('disabled',
-      'true') | map(attribute='from') | map('truncate', 2, True, '')
-      | join(' | ') }}
+  - binary_sensor.let_the_dog_out
 ```
 
 ## Install
