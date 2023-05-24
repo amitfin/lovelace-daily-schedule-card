@@ -48,7 +48,7 @@ class DailyScheduleCard extends HTMLElement {
       const entity = entry.entity || entry;
       const row = document.createElement("DIV");
       row._entity = entity;
-      row._template_value = entry.template;
+      row._template_value = entry.template || this._config.template;
       row.classList.add("card-content");
       if (this._hass.states[entity]) {
         const content = this._createCardRow(
@@ -125,7 +125,8 @@ class DailyScheduleCard extends HTMLElement {
   _rowTemplateValue(row) {
     const subscribed = this._hass.connection.subscribeMessage(
       (message) => {
-        row._content._value_element.innerHTML = message.result;
+        row._content._value_element.innerHTML = 
+          message.result.length ? message.result : "&empty;";
         subscribed.then((unsub) => unsub());
       },
       {
