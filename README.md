@@ -20,12 +20,14 @@ _Note: The custom integration is a prerequisite and can be installed via HACS us
 | type | string | True | - | Must be `custom:daily-schedule-card`
 | title | string | False | - | Title of the card
 | card | bool | False | _True if `title` is supplied_ | Whether to render an entire card or rows inside the `entities` card
+
 ### Entities
 
 | Name | Type | Required | Default | Description
 | ---- | ---- | -------- | ------- | -----------
 | entity | string | True | - | The `binary_sensor` entity ID
 | name | string | False | _Friendly name of the entity_ | Name to display
+| template | string | False | `Null` | Template for rendering the value. Has access to `entity_id`.
 
 _Note: you can also just give the entity ID (with no `entity:`) if you don't need to specify the name explicitely._
 
@@ -47,6 +49,18 @@ type: custom:daily-schedule-card
 title: Timers
 entities:
   - binary_sensor.swimming_pool_filter_schedule
+```
+
+### Template Example
+
+```yaml
+type: custom:daily-schedule-card
+card: true
+entities:
+  - entity: binary_sensor.let_the_dog_out
+    template: >-
+      {{ state_attr(entity_id, 'schedule') | map(attribute='from') |
+      map('truncate', 2, True, '') | join(' | ') }}
 ```
 
 ## Install
