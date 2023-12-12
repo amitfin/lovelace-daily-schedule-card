@@ -6,8 +6,7 @@
 
 ![Project Maintenance](https://img.shields.io/badge/maintainer-Amit%20Finkelstein-blue.svg?style=for-the-badge)
 
-
-Dedicated UI for [Daily Schedule Integration](https://github.com/amitfin/daily_schedule) entities with an optimized view and simplyfied editing capabilities.
+Dedicated UI for [Daily Schedule Integration](https://github.com/amitfin/daily_schedule) entities with an optimized view and simplified editing capabilities.
 
 _Note: The custom integration is a prerequisite and can be installed via HACS using this [link](https://my.home-assistant.io/redirect/hacs_repository/?owner=amitfin&repository=daily_schedule&category=integration)._
 
@@ -15,22 +14,22 @@ _Note: The custom integration is a prerequisite and can be installed via HACS us
 
 ### General
 
-| Name | Type | Required | Default | Description
-| ---- | ---- | -------- | ------- | -----------
-| type | string | True | - | Must be `custom:daily-schedule-card`
-| title | string | False | - | Title of the card
-| card | bool | False | _True if `title` is supplied_ | Whether to render an entire card or rows inside the `entities` card
-| template | string | False | `Null` | Template for rendering the value. Has access to `entity_id`
+| Name     | Type   | Required | Default                       | Description                                                         |
+| -------- | ------ | -------- | ----------------------------- | ------------------------------------------------------------------- |
+| type     | string | True     | -                             | Must be `custom:daily-schedule-card`                                |
+| title    | string | False    | -                             | Title of the card                                                   |
+| card     | bool   | False    | _True if `title` is supplied_ | Whether to render an entire card or rows inside the `entities` card |
+| template | string | False    | `Null`                        | Template for rendering the value. Has access to `entity_id`         |
 
 ### Entities
 
-| Name | Type | Required | Default | Description
-| ---- | ---- | -------- | ------- | -----------
-| entity | string | True | - | The `binary_sensor` entity ID
-| name | string | False | _Friendly name of the entity_ | Name to display
-| template | string | False | `Null` | Per-entity template (overrides card's template)
+| Name     | Type   | Required | Default                       | Description                                     |
+| -------- | ------ | -------- | ----------------------------- | ----------------------------------------------- |
+| entity   | string | True     | -                             | The `binary_sensor` entity ID                   |
+| name     | string | False    | _Friendly name of the entity_ | Name to display                                 |
+| template | string | False    | `Null`                        | Per-entity template (overrides card's template) |
 
-_Note: you can also just give the entity ID (with no `entity:`) if you don't need to specify the name explicitely._
+_Note: you can also just give the entity ID (with no `entity:`) if you don't need to specify the name explicitly._
 
 ### Entities Card Example
 
