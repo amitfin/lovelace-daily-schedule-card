@@ -21,6 +21,3 @@ jobs:
         uses: streetsidesoftware/cspell-action@v5.1.0
         with:
           incremental_files_only: false
-          files: |
-            **
-            .*
