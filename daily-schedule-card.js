@@ -71,6 +71,7 @@ class DailyScheduleCard extends HTMLElement {
 
   _updateContent() {
     for (const row of this._content._rows) {
+      row._content._icon.hass = this._hass;
       row._content._icon.stateObj = this._hass.states[row._entity];
       this._setCardRowValue(row);
     }
@@ -84,6 +85,7 @@ class DailyScheduleCard extends HTMLElement {
     content.style.gap = "16px";
     const icon = document.createElement("state-badge");
     icon.style.flex = "none";
+    icon.hass = this._hass;
     icon.stateObj = this._hass.states[entity];
     icon.stateColor = true;
     content._icon = icon;
