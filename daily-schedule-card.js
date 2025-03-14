@@ -25,7 +25,10 @@ class DailyScheduleCard extends HTMLElement {
   }
 
   setConfig(config) {
-    if (this._config !== null && JSON.stringify(this._config) === JSON.stringify(config)) {
+    if (
+      this._config !== null &&
+      JSON.stringify(this._config) === JSON.stringify(config)
+    ) {
       this._config = config;
       return;
     }
@@ -54,8 +57,8 @@ class DailyScheduleCard extends HTMLElement {
         const content = this._createCardRow(
           entity,
           entry.name ||
-          this._hass.states[entity].attributes.friendly_name ||
-          entity
+            this._hass.states[entity].attributes.friendly_name ||
+            entity
         );
         row._content = content;
         this._setCardRowValue(row);
@@ -110,16 +113,24 @@ class DailyScheduleCard extends HTMLElement {
     return content;
   }
 
-  _getStateSchedule(entity) {
+  _getStateSchedule(entity, effective = false) {
     const state = this._hass.states[entity];
-    return !state ? [] : state.attributes.schedule || [];
+    return !state
+      ? []
+      : !effective
+      ? state.attributes.schedule || []
+      : state.attributes.effective_schedule || [];
   }
 
   _rowEntityChanged(row) {
-    const entity_data = this._hass.states[row._entity] ? JSON.stringify(
-      (({ state, attributes }) => ({ state, attributes }))(this._hass.states[row._entity])
-    ) : null;
-    const changed = (row._entity_data !== entity_data);
+    const entity_data = this._hass.states[row._entity]
+      ? JSON.stringify(
+          (({ state, attributes }) => ({ state, attributes }))(
+            this._hass.states[row._entity]
+          )
+        )
+      : null;
+    const changed = row._entity_data !== entity_data;
     row._entity_data = entity_data;
     return changed;
   }
@@ -127,8 +138,9 @@ class DailyScheduleCard extends HTMLElement {
   _rowTemplateValue(row) {
     const subscribed = this._hass.connection.subscribeMessage(
       (message) => {
-        row._content._value_element.innerHTML = 
-          message.result.length ? message.result : "&empty;";
+        row._content._value_element.innerHTML = message.result.length
+          ? message.result
+          : "&empty;";
         subscribed.then((unsub) => unsub());
       },
       {
@@ -144,7 +156,7 @@ class DailyScheduleCard extends HTMLElement {
       return;
     }
     if (!row._template_value) {
-      let value = this._getStateSchedule(row._entity)
+      let value = this._getStateSchedule(row._entity, true)
         .filter((range) => !range.disabled)
         .map((range) => range.from.slice(0, -3) + "-" + range.to.slice(0, -3))
         .join(", ");
@@ -161,7 +173,6 @@ class DailyScheduleCard extends HTMLElement {
     this._dialog = document.createElement("ha-dialog");
     this._dialog.heading = this._createDialogHeader();
     this._dialog.open = false;
-    this._dialog._save_counter = 0;
     const plus = document.createElement("DIV");
     plus.style.color = getComputedStyle(document.body).getPropertyValue(
       "color"
@@ -250,67 +261,13 @@ class DailyScheduleCard extends HTMLElement {
       row.style.marginTop = "12px";
     }
 
-    const from_input = document.createElement("INPUT");
-    from_input.setAttribute("type", "time");
-    from_input.style.padding = "4px 0";
-    from_input.style.cursor = "pointer";
-    if (range.from !== null) {
-      const time = range.from.split(":");
-      from_input.value = time[0] + ":" + time[1];
-    }
-    from_input.onchange = () => {
-      if (from_input.value === "") {
-        return;
-      }
-      setTimeout(
-        (counter) => {
-          if (counter < this._dialog._save_counter) {
-            return;
-          }
-          const time = from_input.value + ":00";
-          if (range.from !== time) {
-            range.from = time;
-            this._saveBackendEntity();
-          }
-        },
-        1000,
-        ++(this._dialog._save_counter),
-      );
-    };
-    row.appendChild(from_input);
+    this._createTimeInput(range, "from", row);
 
     const arrow = document.createElement("ha-icon");
     arrow.icon = "mdi:arrow-right-thick";
     row.appendChild(arrow);
 
-    const to_input = document.createElement("INPUT");
-    to_input.setAttribute("type", "time");
-    to_input.style.padding = "4px 0";
-    to_input.style.cursor = "pointer";
-    if (range.to !== null) {
-      const time = range.to.split(":");
-      to_input.value = time[0] + ":" + time[1];
-    }
-    to_input.onchange = () => {
-      if (to_input.value === "") {
-        return;
-      }
-      setTimeout(
-        (counter) => {
-          if (counter < this._dialog._save_counter) {
-            return;
-          }
-          const time = to_input.value + ":00";
-          if (range.to !== time) {
-            range.to = time;
-            this._saveBackendEntity();
-          }
-        },
-        1000,
-        ++(this._dialog._save_counter),
-      );
-    };
-    row.appendChild(to_input);
+    this._createTimeInput(range, "to", row);
 
     const toggle = document.createElement("ha-switch");
     toggle.style.marginLeft = "auto";
@@ -326,13 +283,98 @@ class DailyScheduleCard extends HTMLElement {
     remove.icon = "mdi:delete-outline";
     remove.style.cursor = "pointer";
     remove.onclick = () => {
-      this._dialog._schedule = this._dialog._schedule.filter((_, i) => i !== index);
+      this._dialog._schedule = this._dialog._schedule.filter(
+        (_, i) => i !== index
+      );
       this._createDialogRows();
       this._saveBackendEntity();
     };
     row.appendChild(remove);
 
     return row;
+  }
+
+  _createTimeInput(range, type, row) {
+    const sunrise = "↑";
+    const sunset = "↓";
+    const time_input = document.createElement("INPUT");
+    const type_symbol = document.createElement("ha-icon");
+
+    if (
+      range[type] &&
+      (range[type][0] == sunrise || range[type][0] == sunset)
+    ) {
+      this._setInputType(
+        range[type][0] == sunrise ? "sunrise" : "sunset",
+        type_symbol,
+        time_input,
+        range[type].slice(1)
+      );
+    } else {
+      this._setInputType("time", type_symbol, time_input, range[type]);
+    }
+
+    type_symbol.style.cursor = "pointer";
+    type_symbol.onclick = () => {
+      if (type_symbol._type == "time") {
+        this._setInputType("sunrise", type_symbol, time_input, null);
+      } else if (type_symbol._type == "sunrise") {
+        this._setInputType("sunset", type_symbol, time_input, null);
+      } else {
+        this._setInputType("time", type_symbol, time_input, null);
+      }
+      time_input.onchange();
+    };
+
+    time_input.style.padding = "4px 0";
+    time_input.style.cursor = "pointer";
+    time_input.onchange = () => {
+      if (!time_input.value) {
+        range[type] = null;
+        this._saveBackendEntity();
+        return;
+      }
+      let value;
+      if (type_symbol._type == "time") {
+        value = time_input.value + ":00";
+      } else {
+        value = type_symbol._type == "sunrise" ? sunrise : sunset;
+        if (time_input.value) {
+          const value_int = parseInt(time_input.value);
+          if (value_int) {
+            value += `${value_int > 0 ? "+" : ""}${time_input.value}`;
+          }
+        }
+      }
+      if (range[type] !== value) {
+        range[type] = value;
+        this._saveBackendEntity();
+      }
+    };
+
+    row.appendChild(type_symbol);
+    row.appendChild(time_input);
+  }
+
+  _setInputType(type, symbol, input, value) {
+    symbol._type = type;
+    if (type == "sunrise" || type == "sunset") {
+      input.setAttribute("type", "number");
+      input.value = parseInt(value || "0");
+      input.style.width = "50px";
+      symbol.icon =
+        type == "sunrise" ? "mdi:weather-sunny" : "mdi:weather-night";
+    } else {
+      input.setAttribute("type", "time");
+      if (value) {
+        const time = value.split(":");
+        input.value = time[0] + ":" + time[1];
+      } else if (input.value) {
+        input.value = null;
+      }
+      input.style.width = "";
+      symbol.icon = "mdi:clock-outline";
+    }
   }
 
   _saveBackendEntity() {

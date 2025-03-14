@@ -6,9 +6,17 @@
 
 ![Project Maintenance](https://img.shields.io/badge/maintainer-Amit%20Finkelstein-blue.svg?style=for-the-badge)
 
-Dedicated UI for [Daily Schedule Integration](https://github.com/amitfin/daily_schedule) entities with an optimized view and simplified editing capabilities.
+UI for [Daily Schedule Integration](https://github.com/amitfin/daily_schedule) entities.
 
 _Note: The custom integration is a prerequisite and can be installed via HACS using this [link](https://my.home-assistant.io/redirect/hacs_repository/?owner=amitfin&repository=daily_schedule&category=integration)._
+
+## Usage
+
+<img width="601" alt="image" src="https://github.com/user-attachments/assets/44dee96b-72e3-4bbe-81d4-b88c3ce9cb63" />
+<br>
+<img width="342" src="https://github.com/user-attachments/assets/dbaf02e2-7bed-48d3-97cf-cc767ea93691" />
+<br>
+<img src="https://github.com/user-attachments/assets/7466f370-f22c-49dc-888a-35233d55f065" width="534"/>
 
 ## Configuration
 
@@ -57,8 +65,8 @@ entities:
 type: custom:daily-schedule-card
 card: true
 template: >-
-  {{ state_attr(entity_id, 'schedule') | rejectattr('disabled',
-  'true') | map(attribute='from') | map('truncate', 2, True, '')
+  {{ state_attr(entity_id, 'effective_schedule') |
+  map(attribute='from') | map('truncate', 2, True, '')
   | join(' | ') }}
 entities:
   - binary_sensor.let_the_dog_out
@@ -69,9 +77,3 @@ entities:
 If you use [HACS](https://hacs.xyz/), the custom card will automatically be registered as needed.
 
 If you don't use HACS, you can download js file from [latest releases](https://github.com/amitfin/lovelace-daily-schedule-card/releases/). Follow [these instructions](https://developers.home-assistant.io/docs/frontend/custom-ui/registering-resources) to register the custom card.
-
-## Usage
-
-![demo](https://user-images.githubusercontent.com/19599059/212492789-a42c6e4e-a6af-4231-94eb-c01358994bbe.png)
-
-[Usage demo clip](https://user-images.githubusercontent.com/19599059/212492805-c2cf0d27-2ea5-462e-b13f-73010eed1758.mov)
