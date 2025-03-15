@@ -6,7 +6,7 @@
 
 ![Project Maintenance](https://img.shields.io/badge/maintainer-Amit%20Finkelstein-blue.svg?style=for-the-badge)
 
-UI for [Daily Schedule Integration](https://github.com/amitfin/daily_schedule) entities.
+Lovelace card for [Daily Schedule Integration](https://github.com/amitfin/daily_schedule) entities.
 
 _Note: The custom integration is a prerequisite and can be installed via HACS using this [link](https://my.home-assistant.io/redirect/hacs_repository/?owner=amitfin&repository=daily_schedule&category=integration)._
 
@@ -18,7 +18,16 @@ _Note: The custom integration is a prerequisite and can be installed via HACS us
 <br>
 <img src="https://github.com/user-attachments/assets/7466f370-f22c-49dc-888a-35233d55f065" width="534"/>
 
-## Configuration
+## Time Ranges
+
+Each range has `from` and `to`. If the `to` is less than or equal `from` it's treated as time in the following day. One interesting case is when `from` equals `to`. This type of range covers the whole day (always on).
+
+There are 3 ways to specify time:
+1. A fixed time (e.g. 12:30).
+2. Sunrise with an optional negative / positive offset.
+3. Sunset with an optional negative / positive offset.
+
+## Lovelace Card Configuration
 
 ### General
 
