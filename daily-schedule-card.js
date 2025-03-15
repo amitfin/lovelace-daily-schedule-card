@@ -5,6 +5,7 @@ class DailyScheduleCard extends HTMLElement {
       return;
     }
     if (!this._dialog) {
+      this._getInputTimeWidth();
       this._createDialog();
       this.appendChild(this._dialog);
     }
@@ -326,8 +327,14 @@ class DailyScheduleCard extends HTMLElement {
       time_input.onchange();
     };
 
-    time_input.style.padding = "4px 0";
-    time_input.style.cursor = "pointer";
+    Object.assign(time_input.style, {
+      width: `${this._input_time_width}px`,
+      minWidth: `${this._input_time_width}px`,
+      boxSizing: "border-box",
+      padding: "4px 0",
+      cursor: "pointer",
+    });
+
     time_input.onchange = () => {
       if (!time_input.value) {
         range[type] = null;
@@ -359,21 +366,32 @@ class DailyScheduleCard extends HTMLElement {
   _setInputType(type, symbol, input, value) {
     symbol._type = type;
     if (type == "sunrise" || type == "sunset") {
-      input.setAttribute("type", "number");
+      input.type = "number";
       input.value = parseInt(value || "0");
-      input.style.width = "50px";
       symbol.icon =
         type == "sunrise" ? "mdi:weather-sunny" : "mdi:weather-night";
     } else {
-      input.setAttribute("type", "time");
+      input.type = "time";
       if (value) {
         const time = value.split(":");
         input.value = time[0] + ":" + time[1];
       } else if (input.value) {
         input.value = null;
       }
-      input.style.width = "";
       symbol.icon = "mdi:clock-outline";
+    }
+  }
+
+  _getInputTimeWidth() {
+    if (!this._input_time_width) {
+      const dummyInput = document.createElement("INPUT");
+      dummyInput.type = "time";
+      dummyInput.style.visibility = "hidden";
+      this.appendChild(dummyInput);
+      setTimeout(() => {
+        this._input_time_width = dummyInput.getBoundingClientRect().width;
+        this.removeChild(dummyInput);
+      }, 0);
     }
   }
 
