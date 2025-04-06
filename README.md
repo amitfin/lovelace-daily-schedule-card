@@ -89,6 +89,6 @@ entities:
 
 ## Install
 
-If you use [HACS](https://hacs.xyz/), the custom card will automatically be registered as needed.
+The custom card is properly registered when installing via [HACS](https://hacs.xyz/).
 
-If you don't use HACS, you can download js file from [latest releases](https://github.com/amitfin/lovelace-daily-schedule-card/releases/). Follow [these instructions](https://developers.home-assistant.io/docs/frontend/custom-ui/registering-resources) to register the custom card.
+Otherwise, the JS file can be downloaded from [latest releases](https://github.com/amitfin/lovelace-daily-schedule-card/releases/). Follow [these instructions](https://developers.home-assistant.io/docs/frontend/custom-ui/registering-resources) to register the custom card.
