@@ -29,7 +29,13 @@ There are 3 ways to specify time:
 
 ## Lovelace Card Configuration
 
-### General
+### Visual Editor
+
+![image](https://github.com/user-attachments/assets/ddb7153d-1b1d-402f-a1f9-5f827cbd0f55)
+
+### Code Editor
+
+#### General
 
 | Name     | Type   | Required | Default                       | Description                                                         |
 | -------- | ------ | -------- | ----------------------------- | ------------------------------------------------------------------- |
@@ -38,7 +44,7 @@ There are 3 ways to specify time:
 | card     | bool   | False    | _True if `title` is supplied_ | Whether to render an entire card or rows inside the `entities` card |
 | template | string | False    | `Null`                        | Template for rendering the value. Has access to `entity_id`         |
 
-### Entities
+#### Entities
 
 | Name     | Type   | Required | Default                       | Description                                     |
 | -------- | ------ | -------- | ----------------------------- | ----------------------------------------------- |
@@ -48,7 +54,7 @@ There are 3 ways to specify time:
 
 _Note: you can also just give the entity ID (with no `entity:`) if you don't need to specify the name explicitly._
 
-### Entities Card Example
+#### Entities Card Example
 
 ```yaml
 type: entities
@@ -59,7 +65,7 @@ entities:
         name: Venta
 ```
 
-### Entire Card Example
+#### Entire Card Example
 
 ```yaml
 type: custom:daily-schedule-card
@@ -68,7 +74,7 @@ entities:
   - binary_sensor.swimming_pool_filter_schedule
 ```
 
-### Template Example
+#### Template Example
 
 ```yaml
 type: custom:daily-schedule-card
