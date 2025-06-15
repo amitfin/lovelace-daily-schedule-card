@@ -5,7 +5,6 @@ class DailyScheduleCard extends HTMLElement {
       return;
     }
     if (!this._dialog) {
-      this._getInputTimeWidth();
       this._createDialog();
       this.appendChild(this._dialog);
     }
@@ -336,8 +335,7 @@ class DailyScheduleCard extends HTMLElement {
     };
 
     Object.assign(time_input.style, {
-      width: `${this._input_time_width}px`,
-      minWidth: `${this._input_time_width}px`,
+      minWidth: "fit-content",
       boxSizing: "border-box",
       padding: "4px 0",
       cursor: "pointer",
@@ -387,19 +385,6 @@ class DailyScheduleCard extends HTMLElement {
         input.value = null;
       }
       symbol.icon = "mdi:clock-outline";
-    }
-  }
-
-  _getInputTimeWidth() {
-    if (!this._input_time_width) {
-      const dummyInput = document.createElement("INPUT");
-      dummyInput.type = "time";
-      dummyInput.style.visibility = "hidden";
-      this.appendChild(dummyInput);
-      setTimeout(() => {
-        this._input_time_width = dummyInput.getBoundingClientRect().width;
-        this.removeChild(dummyInput);
-      }, 0);
     }
   }
 
