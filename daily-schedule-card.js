@@ -278,8 +278,8 @@ class DailyScheduleCard extends HTMLElement {
     this._createTimeInput(range, "to", row);
 
     const toggle = document.createElement("ha-switch");
-    toggle.style.marginLeft = "auto";
-    toggle.style.paddingLeft = "16px";
+    toggle.style.margin = "0 auto";
+    toggle.style.paddingLeft = "8px";
     toggle.checked = !range.disabled;
     toggle.addEventListener("change", () => {
       range.disabled = !range.disabled;
