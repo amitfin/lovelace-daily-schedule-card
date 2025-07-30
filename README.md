@@ -14,7 +14,7 @@ _Note: The custom integration is a prerequisite and can be installed via HACS us
 
 <img width="601" alt="image" src="https://github.com/user-attachments/assets/44dee96b-72e3-4bbe-81d4-b88c3ce9cb63" />
 <br>
-<img width="342" src="https://github.com/user-attachments/assets/dbaf02e2-7bed-48d3-97cf-cc767ea93691" />
+<img width="342" src="https://github.com/user-attachments/assets/43e53f70-fb75-4259-a4fd-18ce5f24bf35" />
 <br>
 <img src="https://github.com/user-attachments/assets/7466f370-f22c-49dc-888a-35233d55f065" width="534"/>
 
