@@ -106,8 +106,7 @@ class DailyScheduleCard extends HTMLElement {
     name_element.innerText = name;
     content.appendChild(name_element);
     const value_element = document.createElement("P");
-    value_element.style.marginLeft = "auto";
-    value_element.style.textAlign = "right";
+    value_element.style.marginInlineStart = "auto";
     content._value_element = value_element;
     content.appendChild(value_element);
     content.onclick = () => {
@@ -148,7 +147,7 @@ class DailyScheduleCard extends HTMLElement {
     const subscribed = this._hass.connection.subscribeMessage(
       (message) => {
         row._content._value_element.innerHTML = message.result.length
-          ? message.result
+          ? `<bdi dir=ֿ"ltr">${message.result}</bdi>`
           : "&empty;";
         subscribed.then((unsub) => unsub());
       },
@@ -170,9 +169,10 @@ class DailyScheduleCard extends HTMLElement {
         .map((range) => range.from.slice(0, -3) + "-" + range.to.slice(0, -3))
         .join(", ");
       if (!value.length) {
-        value = "&empty;";
+        row._content._value_element.innerHTML = "&empty;";
+      } else {
+        row._content._value_element.innerHTML = `<bdi dir=ֿ"ltr">${value}</bdi>`;
       }
-      row._content._value_element.innerHTML = value;
     } else {
       this._rowTemplateValue(row);
     }
