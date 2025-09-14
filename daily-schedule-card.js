@@ -576,7 +576,7 @@ class DailyScheduleCardEditor extends HTMLElement {
     picker.hass = this._hass;
     picker.includeDomains = ["binary_sensor"];
     picker.entityFilter = (entity) =>
-      this._hass.entities[entity.entity_id].platform === "daily_schedule";
+      this._hass.entities?[entity.entity_id]?.platform === "daily_schedule";
     return picker;
   }
 
