@@ -1,5 +1,14 @@
 {
   "version": "0.2",
   "language": "en",
-  "words": ["hass", "unsub", "amitfin", "HACS", "venta", "Venta", "rejectattr"]
+  "words": [
+    "amitfin",
+    "devcontainers",
+    "HACS",
+    "hass",
+    "rejectattr",
+    "unsub",
+    "venta",
+    "Venta"
+  ]
 }
