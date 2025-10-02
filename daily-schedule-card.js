@@ -164,14 +164,16 @@ class DailyScheduleCard extends HTMLElement {
       return;
     }
     if (!row._template_value) {
-      let value = this._getStateSchedule(row._entity, true)
-        .filter((range) => !range.disabled)
-        .map((range) => range.from.slice(0, -3) + "-" + range.to.slice(0, -3))
-        .join(", ");
-      if (!value.length) {
+      const schedule = this._getStateSchedule(row._entity, true);
+      if (!schedule.length) {
         row._content._value_element.innerHTML = "&empty;";
+      } else if (schedule.length == 1 && schedule[0].from === schedule[0].to) {
+        row._content._value_element.innerHTML = "&infin;";
       } else {
-        row._content._value_element.innerHTML = `<bdi dir=ֿ"ltr">${value}</bdi>`;
+        const ranges = schedule
+          .map((range) => `${range.from.slice(0, -3)}-${range.to.slice(0, -3)}`)
+          .join(", ");
+        row._content._value_element.innerHTML = `<bdi dir=ֿ"ltr">${ranges}</bdi>`;
       }
     } else {
       this._rowTemplateValue(row);
