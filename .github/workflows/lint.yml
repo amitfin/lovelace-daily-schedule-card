@@ -1,4 +1,4 @@
-name: biome-check
+name: Lint
 
 on:
   workflow_dispatch:
