@@ -4,7 +4,8 @@
   "customizations": {
     "vscode": {
       "extensions": [
-        "biomejs.biome"
+        "biomejs.biome",
+        "streetsidesoftware.code-spell-checker"
       ],
       "settings": {
         "editor.defaultFormatter": "biomejs.biome",
