@@ -182,6 +182,19 @@ class DailyScheduleCard extends HTMLElement {
 
   _createDialog() {
     this._dialog = document.createElement("ha-dialog");
+    this._dialog.setAttribute("dir", "ltr");
+    this._dialog.style.opacity = "0";
+    this._dialog.addEventListener("opened", () => {
+      const surface = this._dialog.shadowRoot.querySelector(
+        ".mdc-dialog__surface",
+      );
+      if (surface) {
+        surface.style.width = "auto";
+        surface.style.maxWidth = "none";
+        surface.style.minWidth = "0";
+      }
+      this._dialog.style.opacity = "";
+    });
     this._dialog.heading = this._createDialogHeader();
     this._dialog.open = false;
     const plus = document.createElement("DIV");
