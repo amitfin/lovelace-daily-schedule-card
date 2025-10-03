@@ -4,12 +4,21 @@
   "customizations": {
     "vscode": {
       "extensions": [
-        "biomejs.biome",
+        "emeraldwalk.RunOnSave",
         "streetsidesoftware.code-spell-checker"
       ],
       "settings": {
-        "editor.defaultFormatter": "biomejs.biome",
-        "editor.formatOnSave": true
+        "emeraldwalk.runonsave": {
+          "commands": [
+            {
+              "match": "\\.js$",
+              "cmd": "./lint.sh"
+            }
+          ]
+        },
+        "[javascript]": {
+          "editor.formatOnSave": false
+        }
       }
     }
   }
