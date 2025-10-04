@@ -4,6 +4,7 @@
   "customizations": {
     "vscode": {
       "extensions": [
+        "biomejs.biome",
         "emeraldwalk.RunOnSave",
         "streetsidesoftware.code-spell-checker"
       ],
