@@ -1,24 +1,16 @@
 {
   "name": "daily_schedule_card",
-  "image": "mcr.microsoft.com/devcontainers/javascript-node",
+  "image": "ghcr.io/biomejs/biome",
   "customizations": {
     "vscode": {
       "extensions": [
         "biomejs.biome",
-        "emeraldwalk.RunOnSave",
         "streetsidesoftware.code-spell-checker"
       ],
       "settings": {
-        "emeraldwalk.runonsave": {
-          "commands": [
-            {
-              "match": "\\.js$",
-              "cmd": "./lint.sh"
-            }
-          ]
-        },
         "[javascript]": {
-          "editor.formatOnSave": false
+          "editor.formatOnSave": true,
+          "editor.defaultFormatter": "biomejs.biome"
         }
       }
     }

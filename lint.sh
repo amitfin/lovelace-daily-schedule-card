@@ -1,2 +1,2 @@
-#!/usr/bin/env bash
-npx --yes @biomejs/biome check daily-schedule-card.js --write
+#!/usr/bin/env sh
+biome check daily-schedule-card.js --write
