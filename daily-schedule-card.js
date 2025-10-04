@@ -192,6 +192,9 @@ class DailyScheduleCard extends HTMLElement {
         surface.style.width = "auto";
         surface.style.maxWidth = "none";
         surface.style.minWidth = "0";
+        surface.style.height = "auto";
+        surface.style.maxHeight = "none";
+        surface.style.minHeight = "0";
       }
       this._dialog.style.opacity = "";
     });
