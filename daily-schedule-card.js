@@ -190,17 +190,37 @@ class DailyScheduleCard extends HTMLElement {
         ".mdc-dialog__surface",
       );
       if (surface) {
-        surface.style.width = "auto";
-        surface.style.maxWidth = "none";
-        surface.style.minWidth = "0";
-        surface.style.height = "auto";
-        surface.style.maxHeight = "none";
-        surface.style.minHeight = "0";
+        Object.assign(surface.style, {
+          width: "fit-content",
+          maxWidth: "92vw",
+          boxSizing: "border-box",
+          maxHeight: "90vh",
+          overflow: "hidden",
+          margin: "0 auto",
+        });
+      }
+      const content = this._dialog.shadowRoot.querySelector(
+        ".mdc-dialog__content",
+      );
+      if (content) {
+        content.style.overflowY = "auto";
+        content.style.overflowX = "auto";
+        content.style.webkitOverflowScrolling = "touch";
       }
       this._dialog.style.opacity = "";
     });
     this._dialog.heading = this._createDialogHeader();
     this._dialog.open = false;
+    const scroller = document.createElement("div");
+    Object.assign(scroller.style, {
+      display: "inline-block",
+      width: "max-content",
+      maxWidth: "none",
+      whiteSpace: "nowrap",
+      boxSizing: "border-box",
+    });
+    this._dialog._scroller = scroller;
+    this._dialog.appendChild(scroller);
     const plus = document.createElement("DIV");
     plus.style.color = getComputedStyle(document.body).getPropertyValue(
       "color",
@@ -233,12 +253,12 @@ class DailyScheduleCard extends HTMLElement {
   }
 
   _createDialogRows() {
-    this._dialog.innerHTML = "";
+    this._dialog._scroller.innerHTML = "";
     this._dialog._schedule.forEach((range, index) => {
-      this._dialog.appendChild(this._createDialogRow(range, index));
+      this._dialog._scroller.appendChild(this._createDialogRow(range, index));
     });
-    this._dialog.appendChild(this._dialog._plus);
-    this._dialog.appendChild(this._dialog._message);
+    this._dialog._scroller.appendChild(this._dialog._plus);
+    this._dialog._scroller.appendChild(this._dialog._message);
   }
 
   _createDialogHeader() {
@@ -416,7 +436,10 @@ class DailyScheduleCard extends HTMLElement {
       dummyInput.style.visibility = "hidden";
       this.appendChild(dummyInput);
       setTimeout(() => {
-        this._input_time_width = dummyInput.getBoundingClientRect().width;
+        this._input_time_width = Math.min(
+          dummyInput.getBoundingClientRect().width,
+          100,
+        );
         this.removeChild(dummyInput);
       }, 0);
     }
