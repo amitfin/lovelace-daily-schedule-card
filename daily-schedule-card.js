@@ -254,9 +254,9 @@ class DailyScheduleCard extends HTMLElement {
 
   _createDialogRows() {
     this._dialog._scroller.innerHTML = "";
-    this._dialog._schedule.forEach((range, index) => {
+    for (const [index, range] of this._dialog._schedule.entries()) {
       this._dialog._scroller.appendChild(this._createDialogRow(range, index));
-    });
+    }
     this._dialog._scroller.appendChild(this._dialog._plus);
     this._dialog._scroller.appendChild(this._dialog._message);
   }
@@ -568,7 +568,7 @@ class DailyScheduleCardEditor extends HTMLElement {
       if (value) {
         this._config.title = value;
       } else {
-        delete this._config.title;
+        this._config.title = undefined;
       }
       this._configChanged();
     });
@@ -603,9 +603,9 @@ class DailyScheduleCardEditor extends HTMLElement {
     const entities = document.createElement("DIV");
     entities.classList.add("entities");
 
-    this._config.entities.forEach((config, index) => {
+    for (const [index, config] of this._config.entities.entries()) {
       this._addEntity(config, index, entities);
-    });
+    }
 
     sortable.appendChild(entities);
     this._shadow.appendChild(sortable);

@@ -1,0 +1,32 @@
+{
+  "name": "lovelace-daily-schedule-card",
+  "version": "1.0.0",
+  "description": "Lovelace card for daily schedule integration entities in Home Assistant",
+  "main": "daily-schedule-card.js",
+  "scripts": {
+    "lint": "biome check --write",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/amitfin/lovelace-daily-schedule-card.git"
+  },
+  "keywords": [
+    "home-assistant",
+    "lovelace-custom-card",
+    "hacs",
+    "lovelace"
+  ],
+  "author": "amitfin",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/amitfin/lovelace-daily-schedule-card/issues"
+  },
+  "homepage": "https://github.com/amitfin/lovelace-daily-schedule-card#readme",
+  "devDependencies": {
+    "@biomejs/biome": "^2",
+    "jsdom": "^27",
+    "vitest": "^4"
+  }
+}

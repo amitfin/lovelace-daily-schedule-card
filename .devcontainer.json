@@ -1,12 +1,10 @@
 {
   "name": "daily_schedule_card",
-  "image": "ghcr.io/biomejs/biome",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node",
+  "postStartCommand": "rm -rf node_modules package-lock.json && npm install --no-audit --no-fund",
   "customizations": {
     "vscode": {
-      "extensions": [
-        "biomejs.biome",
-        "streetsidesoftware.code-spell-checker"
-      ],
+      "extensions": ["biomejs.biome", "streetsidesoftware.code-spell-checker"],
       "settings": {
         "[javascript]": {
           "editor.formatOnSave": true,

@@ -1,7 +1,9 @@
-name: Lint
+name: Validate
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * *"
   push:
     branches:
       - main
@@ -10,8 +12,8 @@ on:
       - main
 
 jobs:
-  check:
-    name: Lint
+  test:
+    name: Tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the repository
@@ -22,5 +24,8 @@ jobs:
           node-version: 'lts/*'
           cache: "npm"
 
-      - name: Biome check
-        run: npx --yes @biomejs/biome check
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Run tests
+        run: npm run test
