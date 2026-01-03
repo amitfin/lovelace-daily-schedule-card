@@ -12,6 +12,15 @@ on:
       - main
 
 jobs:
+  hacs:
+    name: HACS Action
+    runs-on: ubuntu-latest
+    steps:
+      - name: HACS Action
+        uses: hacs/action@main
+        with:
+          category: plugin
+
   test:
     name: Tests
     runs-on: ubuntu-latest
