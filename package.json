@@ -5,8 +5,7 @@
   "main": "daily-schedule-card.js",
   "scripts": {
     "lint": "biome check --write",
-    "test": "vitest run",
-    "test:watch": "vitest"
+    "test": "vitest run --coverage"
   },
   "repository": {
     "type": "git",
@@ -26,6 +25,7 @@
   "homepage": "https://github.com/amitfin/lovelace-daily-schedule-card#readme",
   "devDependencies": {
     "@biomejs/biome": "^2",
+    "@vitest/coverage-v8": "^4",
     "jsdom": "^27",
     "vitest": "^4"
   }

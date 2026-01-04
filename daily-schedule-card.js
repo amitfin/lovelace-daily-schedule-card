@@ -42,7 +42,7 @@ class DailyScheduleCard extends HTMLElement {
   }
 
   getCardSize() {
-    return this._config !== null ? this._config.entities.length : 1;
+    return this._config ? this._config.entities.length : 1;
   }
 
   static getConfigElement() {
@@ -73,7 +73,7 @@ class DailyScheduleCard extends HTMLElement {
         this._setCardRowValue(row);
         row.appendChild(content);
       } else {
-        row.innerText = `Entity not found: ${entry.entity}`;
+        row.innerText = `Entity not found: ${entity}`;
       }
       content._rows.push(row);
       content.appendChild(row);
@@ -446,9 +446,10 @@ class DailyScheduleCard extends HTMLElement {
   }
 
   _saveBackendEntity() {
+    const schedule = this._dialog._schedule || [];
     this._dialog._plus._button.disabled = true;
 
-    for (const range of this._dialog._schedule) {
+    for (const range of schedule) {
       if (range.from === null || range.to === null) {
         if (this._dialog._message.innerText !== "Missing field(s).") {
           this._dialog._message.innerText = "Missing field(s).";
@@ -460,7 +461,7 @@ class DailyScheduleCard extends HTMLElement {
     this._hass
       .callService("daily_schedule", "set", {
         entity_id: this._dialog._entity,
-        schedule: this._dialog._schedule,
+        schedule,
       })
       .then(() => {
         if (this._dialog._message.innerText.length > 0) {
@@ -472,7 +473,6 @@ class DailyScheduleCard extends HTMLElement {
         if (this._dialog._message.innerText !== error.message) {
           this._dialog._message.innerText = error.message;
         }
-        return Promise.reject(error);
       });
   }
 }
