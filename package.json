@@ -26,7 +26,7 @@
   "devDependencies": {
     "@biomejs/biome": "^2",
     "@vitest/coverage-v8": "^4",
-    "jsdom": "^27",
+    "jsdom": "^28",
     "vitest": "^4"
   }
 }
