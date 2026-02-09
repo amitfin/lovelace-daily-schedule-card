@@ -25,6 +25,7 @@
   "homepage": "https://github.com/amitfin/lovelace-daily-schedule-card#readme",
   "devDependencies": {
     "@biomejs/biome": "^2",
+    "@j178/prek": "^0",
     "@vitest/coverage-v8": "^4",
     "jsdom": "^28",
     "vitest": "^4"

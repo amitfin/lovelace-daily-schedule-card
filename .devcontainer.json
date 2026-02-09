@@ -1,7 +1,7 @@
 {
   "name": "daily_schedule_card",
   "image": "mcr.microsoft.com/devcontainers/javascript-node",
-  "postCreateCommand": "rm -rf node_modules package-lock.json && npm install --no-audit --no-fund",
+  "postCreateCommand": "rm -rf node_modules package-lock.json && npm install --no-audit --no-fund && npx prek install",
   "customizations": {
     "vscode": {
       "extensions": ["biomejs.biome", "streetsidesoftware.code-spell-checker"],
