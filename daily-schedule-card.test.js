@@ -33,34 +33,25 @@ beforeAll(() => {
     class HaDialog extends HTMLElement {
       constructor() {
         super();
-        const root = this.attachShadow({ mode: "open" });
-        const surface = document.createElement("div");
-        surface.className = "mdc-dialog__surface";
-        const content = document.createElement("div");
-        content.className = "mdc-dialog__content";
-        root.appendChild(surface);
-        root.appendChild(content);
-
         this.open = false;
-      }
-
-      set heading(v) {
-        this._heading = v;
-      }
-      get heading() {
-        return this._heading;
-      }
-
-      show() {
-        this.open = true;
-        this.dispatchEvent(new Event("opened"));
-      }
-
-      close() {
-        this.open = false;
+        this.width = "medium";
+        this.headerTitle = undefined;
       }
     }
     customElements.define("ha-dialog", HaDialog);
+  }
+
+  // ha-adaptive-dialog
+  if (!customElements.get("ha-adaptive-dialog")) {
+    class HaAdaptiveDialog extends HTMLElement {
+      constructor() {
+        super();
+        this.open = false;
+        this.width = "medium";
+        this.headerTitle = undefined;
+      }
+    }
+    customElements.define("ha-adaptive-dialog", HaAdaptiveDialog);
   }
 
   // state-badge
@@ -250,6 +241,16 @@ function flushMicrotasks(times = 2) {
 
 beforeEach(() => {
   document.body.style.color = "rgb(0, 0, 0)";
+  window.matchMedia = vi.fn((query) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  }));
 });
 
 afterEach(() => {
@@ -371,8 +372,9 @@ describe("DailyScheduleCard - content creation, update, schedules & template", (
       { entities: [{ entity: "sensor.missing", name: "Missing" }] },
       hass,
     );
-    const row = card._content._rows[0];
+    const row = card._content.children[0];
 
+    expect(card._content._rows).toHaveLength(0);
     expect(row.innerText).toMatch(/Entity not found/i);
     expect(row.innerText).toMatch(/sensor\.missing/i);
   });
@@ -639,57 +641,32 @@ describe("DailyScheduleCard - content creation, update, schedules & template", (
 });
 
 describe("DailyScheduleCard - dialog behavior (open, add, toggle, remove, close, more-info)", () => {
-  test("dialog opened handler tolerates missing surface/content nodes", () => {
+  test("dialog is created with desktop ha-dialog configuration", () => {
     const hass = createHass();
     const card = mountCard({ entities: ["binary_sensor.a"] }, hass);
 
-    card._createDialog();
-
-    // Force querySelector to return null for both surface/content lookups
-    const querySpy = vi
-      .spyOn(card._dialog.shadowRoot, "querySelector")
-      .mockReturnValue(null);
-
-    // Should not throw
-    card._dialog.dispatchEvent(new Event("opened"));
-    expect(card._dialog.style.opacity).toBe("");
-
-    querySpy.mockRestore();
+    expect(card._dialog).toBeDefined();
+    expect(card._dialog.tagName).toBe("HA-DIALOG");
+    expect(card._dialog.width).toBe("medium");
   });
 
-  test("dialog opened handler styles surface/content and resets opacity", () => {
-    const hass = createHass({
-      states: {
-        "sensor.a": {
-          state: "on",
-          attributes: { friendly_name: "A", effective_schedule: [] },
-        },
-      },
-    });
+  test("dialog uses ha-adaptive-dialog on mobile", () => {
+    window.matchMedia = vi.fn((query) => ({
+      matches: query === "(max-width: 600px)",
+      media: query,
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    }));
 
-    const card = mountCard({ entities: ["sensor.a"] }, hass);
+    const hass = createHass();
+    const card = mountCard({ entities: ["binary_sensor.a"] }, hass);
 
-    expect(card._dialog).toBeDefined();
-    expect(card._dialog.style.opacity).toBe("0");
-
-    card._dialog.show();
-
-    const surface = card._dialog.shadowRoot.querySelector(
-      ".mdc-dialog__surface",
-    );
-    const content = card._dialog.shadowRoot.querySelector(
-      ".mdc-dialog__content",
-    );
-
-    expect(surface.style.width).toBe("fit-content");
-    expect(surface.style.maxWidth).toBe("92vw");
-    expect(surface.style.maxHeight).toBe("90vh");
-    expect(surface.style.overflow).toBe("hidden");
-
-    expect(content.style.overflowY).toBe("auto");
-    expect(content.style.overflowX).toBe("auto");
-
-    expect(card._dialog.style.opacity).toBe("");
+    expect(card._dialog.tagName).toBe("HA-ADAPTIVE-DIALOG");
+    expect(card._dialog.width).toBe("full");
   });
 
   test("clicking row populates dialog and creates rows", () => {
@@ -717,9 +694,9 @@ describe("DailyScheduleCard - dialog behavior (open, add, toggle, remove, close,
     row._content.onclick();
 
     expect(card._dialog._entity).toBe("sensor.a");
-    expect(card._dialog._title.innerText).toBe("A");
+    expect(card._dialog.headerTitle).toBe("A");
     expect(card._dialog._message.innerText).toBe("");
-    expect(card._dialog._plus._button.disabled).toBe(false);
+    expect(card._dialog._plus.tagName).toBe("HA-ICON-BUTTON");
 
     expect(card._dialog._schedule).toEqual([
       { from: "08:00:00", to: "09:00:00" },
@@ -728,7 +705,7 @@ describe("DailyScheduleCard - dialog behavior (open, add, toggle, remove, close,
     expect(card._dialog.open).toBe(true);
   });
 
-  test("plus onclick respects disabled=true branch and enabled branch (adds null range)", () => {
+  test("plus onclick adds null range and triggers row refresh/save", () => {
     const hass = createHass({
       states: {
         "sensor.a": {
@@ -749,12 +726,6 @@ describe("DailyScheduleCard - dialog behavior (open, add, toggle, remove, close,
     const saveSpy = vi.spyOn(card, "_saveBackendEntity");
     const rowsSpy = vi.spyOn(card, "_createDialogRows");
 
-    card._dialog._plus._button.disabled = true;
-    card._dialog._plus.onclick();
-    expect(card._dialog._schedule).toHaveLength(1);
-    expect(saveSpy).toHaveBeenCalledTimes(0);
-
-    card._dialog._plus._button.disabled = false;
     card._dialog._plus.onclick();
     expect(card._dialog._schedule).toHaveLength(2);
     expect(card._dialog._schedule[1]).toEqual({ from: null, to: null });
@@ -781,10 +752,14 @@ describe("DailyScheduleCard - dialog behavior (open, add, toggle, remove, close,
     card._content._rows[0]._content.onclick();
     expect(card._dialog.open).toBe(true);
 
-    const header = card._dialog.heading;
-    const icons = header.querySelectorAll("ha-icon");
-    const closeIcon = icons[0];
-    const moreInfoIcon = icons[1];
+    const closeIcon = card._dialog.querySelector(
+      "ha-icon-button[data-role='dialog-close']",
+    );
+    const moreInfoIcon = card._dialog.querySelector(
+      "ha-icon-button[data-role='more-info']",
+    );
+    expect(closeIcon).toBeTruthy();
+    expect(moreInfoIcon).toBeTruthy();
 
     closeIcon.onclick();
     expect(card._dialog.open).toBe(false);
@@ -854,8 +829,8 @@ describe("DailyScheduleCard - dialog behavior (open, add, toggle, remove, close,
     const rowsSpy = vi.spyOn(card, "_createDialogRows");
 
     const firstRowEl = card._dialog._scroller.children[0];
-    const icons = firstRowEl.querySelectorAll("ha-icon");
-    const removeIcon = icons[icons.length - 1];
+    const rowIcons = firstRowEl.querySelectorAll("ha-icon");
+    const removeIcon = rowIcons[rowIcons.length - 1];
 
     removeIcon.onclick();
     expect(card._dialog._schedule).toHaveLength(1);
@@ -1039,7 +1014,6 @@ describe("DailyScheduleCard - time input behaviors", () => {
 
     card._dialog._entity = "sensor.a";
     card._dialog._schedule = [];
-    card._dialog._plus._button.disabled = false;
     card._dialog._message.innerText = "";
 
     const saveSpy = vi.spyOn(card, "_saveBackendEntity");
@@ -1123,7 +1097,7 @@ describe("DailyScheduleCard - time input behaviors", () => {
 });
 
 describe("DailyScheduleCard - _saveBackendEntity branches", () => {
-  test("early returns on missing from/to sets Missing field(s). and keeps plus disabled", () => {
+  test("early returns on missing from/to sets Missing field(s).", () => {
     const hass = createHass({
       states: {
         "sensor.a": {
@@ -1140,17 +1114,15 @@ describe("DailyScheduleCard - _saveBackendEntity branches", () => {
     const card = mountCard({ entities: ["sensor.a"] }, hass);
     card._dialog._entity = "sensor.a";
     card._dialog._schedule = [{ from: null, to: "10:00:00" }];
-    card._dialog._plus._button.disabled = false;
     card._dialog._message.innerText = "";
 
     card._saveBackendEntity();
 
-    expect(card._dialog._plus._button.disabled).toBe(true);
     expect(card._dialog._message.innerText).toBe("Missing field(s).");
     expect(hass.callService).not.toHaveBeenCalled();
   });
 
-  test("success path clears message only if had content and re-enables plus", async () => {
+  test("success path clears message only if had content", async () => {
     const hass = createHass({
       states: {
         "sensor.a": {
@@ -1167,7 +1139,6 @@ describe("DailyScheduleCard - _saveBackendEntity branches", () => {
     const card = mountCard({ entities: ["sensor.a"] }, hass);
     card._dialog._entity = "sensor.a";
     card._dialog._schedule = [{ from: "09:00:00", to: "10:00:00" }];
-    card._dialog._plus._button.disabled = false;
     card._dialog._message.innerText = "old";
 
     card._saveBackendEntity();
@@ -1179,7 +1150,6 @@ describe("DailyScheduleCard - _saveBackendEntity branches", () => {
     });
 
     expect(card._dialog._message.innerText).toBe("");
-    expect(card._dialog._plus._button.disabled).toBe(false);
   });
 
   test("failure path sets message only if changed (covers both branches)", async () => {
@@ -1200,14 +1170,12 @@ describe("DailyScheduleCard - _saveBackendEntity branches", () => {
     const card = mountCard({ entities: ["sensor.a"] }, hass);
     card._dialog._entity = "sensor.a";
     card._dialog._schedule = [{ from: "09:00:00", to: "10:00:00" }];
-    card._dialog._plus._button.disabled = false;
     card._dialog._message.innerText = "";
 
     // first error sets message
     card._saveBackendEntity();
     await flushMicrotasks(3);
     expect(card._dialog._message.innerText).toBe("boom");
-    expect(card._dialog._plus._button.disabled).toBe(true);
 
     // second error with same message should keep it the same (covers equality branch)
     card._saveBackendEntity();

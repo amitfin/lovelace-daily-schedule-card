@@ -8,6 +8,8 @@ class DailyScheduleCard extends HTMLElement {
       this._getInputTimeWidth();
       this._createDialog();
       this.appendChild(this._dialog);
+    } else {
+      this._dialog.hass = hass;
     }
     if (!this._content) {
       this._content = this._createContent();
@@ -39,6 +41,7 @@ class DailyScheduleCard extends HTMLElement {
     this._config = config;
     this.innerHTML = "";
     this._content = null;
+    this._dialog = null;
   }
 
   getCardSize() {
@@ -63,19 +66,19 @@ class DailyScheduleCard extends HTMLElement {
       row._template_value = entry.template || this._config.template;
       row.classList.add("card-content");
       if (this._hass.states[entity]) {
-        const content = this._createCardRow(
+        const rowContent = this._createCardRow(
           entity,
           entry.name ||
             this._hass.states[entity].attributes.friendly_name ||
             entity,
         );
-        row._content = content;
+        row._content = rowContent;
         this._setCardRowValue(row);
-        row.appendChild(content);
+        row.appendChild(rowContent);
+        content._rows.push(row);
       } else {
         row.innerText = `Entity not found: ${entity}`;
       }
-      content._rows.push(row);
       content.appendChild(row);
     }
     return content;
@@ -112,12 +115,11 @@ class DailyScheduleCard extends HTMLElement {
     content.appendChild(value_element);
     content.onclick = () => {
       this._dialog._entity = entity;
-      this._dialog._title.innerText = name;
+      this._dialog.headerTitle = name;
       this._dialog._message.innerText = "";
-      this._dialog._plus._button.disabled = false;
       this._dialog._schedule = [...this._getStateSchedule(entity)];
       this._createDialogRows();
-      this._dialog.show();
+      this._dialog.open = true;
     };
     return content;
   }
@@ -148,7 +150,7 @@ class DailyScheduleCard extends HTMLElement {
     const subscribed = this._hass.connection.subscribeMessage(
       (message) => {
         row._content._value_element.innerHTML = message.result.length
-          ? `<bdi dir=ֿ"ltr">${message.result}</bdi>`
+          ? `<bdi dir="ltr">${message.result}</bdi>`
           : "&empty;";
         subscribed.then((unsub) => unsub());
       },
@@ -174,7 +176,7 @@ class DailyScheduleCard extends HTMLElement {
         const ranges = schedule
           .map((range) => `${range.from.slice(0, -3)}-${range.to.slice(0, -3)}`)
           .join(", ");
-        row._content._value_element.innerHTML = `<bdi dir=ֿ"ltr">${ranges}</bdi>`;
+        row._content._value_element.innerHTML = `<bdi dir="ltr">${ranges}</bdi>`;
       }
     } else {
       this._rowTemplateValue(row);
@@ -182,34 +184,17 @@ class DailyScheduleCard extends HTMLElement {
   }
 
   _createDialog() {
-    this._dialog = document.createElement("ha-dialog");
+    const isMobile = this._isMobileView();
+
+    this._dialog = document.createElement(
+      isMobile && customElements.get("ha-adaptive-dialog")
+        ? "ha-adaptive-dialog"
+        : "ha-dialog",
+    );
+    this._dialog.hass = this._hass;
     this._dialog.setAttribute("dir", "ltr");
-    this._dialog.style.opacity = "0";
-    this._dialog.addEventListener("opened", () => {
-      const surface = this._dialog.shadowRoot.querySelector(
-        ".mdc-dialog__surface",
-      );
-      if (surface) {
-        Object.assign(surface.style, {
-          width: "fit-content",
-          maxWidth: "92vw",
-          boxSizing: "border-box",
-          maxHeight: "90vh",
-          overflow: "hidden",
-          margin: "0 auto",
-        });
-      }
-      const content = this._dialog.shadowRoot.querySelector(
-        ".mdc-dialog__content",
-      );
-      if (content) {
-        content.style.overflowY = "auto";
-        content.style.overflowX = "auto";
-        content.style.webkitOverflowScrolling = "touch";
-      }
-      this._dialog.style.opacity = "";
-    });
-    this._dialog.heading = this._createDialogHeader();
+    this._dialog.width = isMobile ? "full" : "medium";
+    this._createDialogHeader();
     this._dialog.open = false;
     const scroller = document.createElement("div");
     Object.assign(scroller.style, {
@@ -221,25 +206,12 @@ class DailyScheduleCard extends HTMLElement {
     });
     this._dialog._scroller = scroller;
     this._dialog.appendChild(scroller);
-    const plus = document.createElement("DIV");
-    plus.style.color = getComputedStyle(document.body).getPropertyValue(
-      "color",
-    );
-    plus.style.display = "flex";
-    const button = document.createElement("mwc-icon-button");
-    plus._button = button;
-    plus.appendChild(button);
+    const plus = document.createElement("ha-icon-button");
+    plus.style.marginLeft = "-12px";
     const icon = document.createElement("ha-icon");
-    icon.style.marginTop = "-9px";
     icon.icon = "mdi:plus";
-    button.appendChild(icon);
-    const text = document.createElement("P");
-    text.innerText = "Add Range";
-    plus.appendChild(text);
+    plus.appendChild(icon);
     plus.onclick = () => {
-      if (button.disabled === true) {
-        return;
-      }
       this._dialog._schedule.push({ from: null, to: null });
       this._createDialogRows();
       this._saveBackendEntity();
@@ -250,6 +222,10 @@ class DailyScheduleCard extends HTMLElement {
     message.style.color = "red";
     message.innerText = "";
     this._dialog._message = message;
+  }
+
+  _isMobileView() {
+    return window.matchMedia("(max-width: 600px)").matches;
   }
 
   _createDialogRows() {
@@ -263,30 +239,28 @@ class DailyScheduleCard extends HTMLElement {
 
   _createDialogHeader() {
     const header = document.createElement("DIV");
-    header.style.color = getComputedStyle(document.body).getPropertyValue(
-      "color",
-    );
+    header.slot = "headerNavigationIcon";
     header.style.display = "flex";
-    header.style.gap = "12px";
-    header.style.alignItems = "start";
-    const close = document.createElement("ha-icon");
-    close.icon = "mdi:close";
-    close.style.marginLeft = "-4px";
-    close.style.cursor = "pointer";
+    header.style.alignItems = "center";
+
+    const close = document.createElement("ha-icon-button");
+    close.dataset.role = "dialog-close";
+    const close_icon = document.createElement("ha-icon");
+    close_icon.icon = "mdi:close";
+    close.appendChild(close_icon);
     close.onclick = () => {
-      this._dialog.close();
+      this._dialog.open = false;
     };
     header.appendChild(close);
-    const title = document.createElement("P");
-    title.style.margin = "1px 0 0 0";
-    header.appendChild(title);
-    this._dialog._title = title;
-    const more_info = document.createElement("ha-icon");
-    more_info.icon = "mdi:information-outline";
-    more_info.style.marginLeft = "auto";
-    more_info.style.cursor = "pointer";
+
+    const more_info = document.createElement("ha-icon-button");
+    more_info.slot = "headerActionItems";
+    more_info.dataset.role = "more-info";
+    const more_info_icon = document.createElement("ha-icon");
+    more_info_icon.icon = "mdi:information-outline";
+    more_info.appendChild(more_info_icon);
     more_info.onclick = () => {
-      this._dialog.close();
+      this._dialog.open = false;
       const event = new Event("hass-more-info", {
         bubbles: true,
         cancelable: false,
@@ -295,8 +269,8 @@ class DailyScheduleCard extends HTMLElement {
       event.detail = { entityId: this._dialog._entity };
       this.dispatchEvent(event);
     };
-    header.appendChild(more_info);
-    return header;
+    this._dialog.appendChild(more_info);
+    this._dialog.appendChild(header);
   }
 
   _createDialogRow(range, index) {
@@ -440,14 +414,13 @@ class DailyScheduleCard extends HTMLElement {
           dummyInput.getBoundingClientRect().width,
           100,
         );
-        this.removeChild(dummyInput);
+        dummyInput.remove();
       }, 0);
     }
   }
 
   _saveBackendEntity() {
     const schedule = this._dialog._schedule || [];
-    this._dialog._plus._button.disabled = true;
 
     for (const range of schedule) {
       if (range.from === null || range.to === null) {
@@ -467,7 +440,6 @@ class DailyScheduleCard extends HTMLElement {
         if (this._dialog._message.innerText.length > 0) {
           this._dialog._message.innerText = "";
         }
-        this._dialog._plus._button.disabled = false;
       })
       .catch((error) => {
         if (this._dialog._message.innerText !== error.message) {
