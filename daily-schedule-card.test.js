@@ -669,6 +669,16 @@ describe("DailyScheduleCard - dialog behavior (open, add, toggle, remove, close,
     expect(card._dialog.width).toBe("full");
   });
 
+  test("dialog closed event resets open flag", () => {
+    const hass = createHass();
+    const card = mountCard({ entities: ["binary_sensor.a"] }, hass);
+
+    card._dialog.open = true;
+    card._dialog.dispatchEvent(new Event("closed"));
+
+    expect(card._dialog.open).toBe(false);
+  });
+
   test("clicking row populates dialog and creates rows", () => {
     const hass = createHass({
       states: {

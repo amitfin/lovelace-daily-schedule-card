@@ -194,6 +194,9 @@ class DailyScheduleCard extends HTMLElement {
     this._dialog.hass = this._hass;
     this._dialog.setAttribute("dir", "ltr");
     this._dialog.width = isMobile ? "full" : "medium";
+    this._dialog.addEventListener("closed", () => {
+      this._dialog.open = false;
+    });
     this._createDialogHeader();
     this._dialog.open = false;
     const scroller = document.createElement("div");
