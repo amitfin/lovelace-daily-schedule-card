@@ -282,9 +282,7 @@ class DailyScheduleCard extends HTMLElement {
     row.style.display = "flex";
     row.style.gap = "4px";
     row.style.alignItems = "center";
-    if (index > 0) {
-      row.style.marginTop = "12px";
-    }
+    row.style.marginTop = "12px";
 
     this._createTimeInput(range, "from", row);
 

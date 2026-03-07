@@ -848,7 +848,7 @@ describe("DailyScheduleCard - dialog behavior (open, add, toggle, remove, close,
     expect(saveSpy).toHaveBeenCalled();
   });
 
-  test("_createDialogRow sets marginTop when index > 0", () => {
+  test("_createDialogRow sets consistent marginTop", () => {
     const hass = createHass({
       states: {
         "sensor.a": {
@@ -867,7 +867,7 @@ describe("DailyScheduleCard - dialog behavior (open, add, toggle, remove, close,
     const r0 = card._createDialogRow({ from: "08:00:00", to: "09:00:00" }, 0);
     const r1 = card._createDialogRow({ from: "10:00:00", to: "11:00:00" }, 1);
 
-    expect(r0.style.marginTop).toBe("");
+    expect(r0.style.marginTop).toBe("12px");
     expect(r1.style.marginTop).toBe("12px");
   });
 });
