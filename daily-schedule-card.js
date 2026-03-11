@@ -456,14 +456,24 @@ class DailyScheduleCard extends HTMLElement {
   }
 }
 
-customElements.define("daily-schedule-card", DailyScheduleCard);
+function _register(elementTag, className) {
+  if (!customElements.get(elementTag)) {
+    customElements.define(elementTag, className);
+  }
+}
+_register("daily-schedule-card", DailyScheduleCard);
+customElements
+  .whenDefined("home-assistant")
+  .then(() => _register("daily-schedule-card", DailyScheduleCard));
 window.customCards = window.customCards || [];
-window.customCards.push({
-  type: "daily-schedule-card",
-  name: "Daily Schedule",
-  description: "Card for displaying and editing Daily Schedule entities.",
-  documentationURL: "https://github.com/amitfin/lovelace-daily-schedule-card",
-});
+if (!window.customCards.some((card) => card.type === "daily-schedule-card")) {
+  window.customCards.push({
+    type: "daily-schedule-card",
+    name: "Daily Schedule",
+    description: "Card for displaying and editing Daily Schedule entities.",
+    documentationURL: "https://github.com/amitfin/lovelace-daily-schedule-card",
+  });
+}
 
 class DailyScheduleCardEditor extends HTMLElement {
   constructor() {
@@ -657,4 +667,4 @@ class DailyScheduleCardEditor extends HTMLElement {
   }
 }
 
-customElements.define("daily-schedule-card-editor", DailyScheduleCardEditor);
+_register("daily-schedule-card-editor", DailyScheduleCardEditor);
