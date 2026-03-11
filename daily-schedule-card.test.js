@@ -666,7 +666,14 @@ describe("DailyScheduleCard - dialog behavior (open, add, toggle, remove, close,
     const card = mountCard({ entities: ["binary_sensor.a"] }, hass);
 
     expect(card._dialog.tagName).toBe("HA-ADAPTIVE-DIALOG");
-    expect(card._dialog.width).toBe("full");
+    expect(card._dialog.width).toBe("medium");
+    expect(card._dialog.hasAttribute("flexcontent")).toBe(true);
+    expect(
+      card._dialog.style.getPropertyValue("--ha-bottom-sheet-height"),
+    ).toBe("calc(100dvh - max(var(--safe-area-inset-top), 48px))");
+    expect(
+      card._dialog.style.getPropertyValue("--ha-bottom-sheet-max-height"),
+    ).toBe("var(--ha-bottom-sheet-height)");
   });
 
   test("dialog closed event resets open flag", () => {

@@ -184,16 +184,22 @@ class DailyScheduleCard extends HTMLElement {
   }
 
   _createDialog() {
-    const isMobile = this._isMobileView();
-
-    this._dialog = document.createElement(
-      isMobile && customElements.get("ha-adaptive-dialog")
-        ? "ha-adaptive-dialog"
-        : "ha-dialog",
-    );
+    if (!this._isMobileView()) {
+      this._dialog = document.createElement("ha-dialog");
+    } else {
+      this._dialog = document.createElement("ha-adaptive-dialog");
+      this._dialog.setAttribute("flexcontent", "");
+      this._dialog.style.setProperty(
+        "--ha-bottom-sheet-height",
+        "calc(100dvh - max(var(--safe-area-inset-top), 48px))",
+      );
+      this._dialog.style.setProperty(
+        "--ha-bottom-sheet-max-height",
+        "var(--ha-bottom-sheet-height)",
+      );
+    }
     this._dialog.hass = this._hass;
     this._dialog.setAttribute("dir", "ltr");
-    this._dialog.width = isMobile ? "full" : "medium";
     this._dialog.addEventListener("closed", () => {
       this._dialog.open = false;
     });
