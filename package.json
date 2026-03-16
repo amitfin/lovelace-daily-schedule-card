@@ -27,7 +27,7 @@
     "@biomejs/biome": "^2",
     "@j178/prek": "^0",
     "@vitest/coverage-v8": "^4",
-    "jsdom": "^28",
+    "jsdom": "^29",
     "vitest": "^4"
   }
 }
