@@ -28,6 +28,6 @@
     "@j178/prek": "^0",
     "@vitest/coverage-v8": "^4",
     "jsdom": "^29",
-    "vitest": "^4"
+    "vitest": "^5"
   }
 }
